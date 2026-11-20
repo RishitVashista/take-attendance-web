@@ -322,7 +322,7 @@
                 <div class="modal-title">Take Attendance</div>
                 <div class="info-text">
                     <strong>Subject:</strong> <span id="headerSubject">-</span><br>
-                    <strong>Teacher:</strong> <span>NamanSharma</span> &nbsp;|&nbsp; 
+                    <strong>Faculty:</strong> <span>NamanSharma</span> &nbsp;|&nbsp; 
                     <strong>Class:</strong> <span id="headerClass">-</span>
                 </div>
                 <!-- Dynamic Line for Absentees -->
@@ -364,10 +364,10 @@
         const academicData = {
             "3rd": {
                 semName: "B.Tech 3rd Semester",
-                teacher: "NamanSharma",
+                Faculty: "NamanSharma",
                 sections: {
                     "A": {
-                        subject: "Mathematical computation for machine learning",
+                        subject: "Mathematical computation for machine learning(CS206",
                         className: "BTech 3rd semester sec A",
                         students: [
                             { roll: "H250033", name: "DHRUV CHAUHAN" }, { roll: "H250044", name: "DEVANSH SHARMA" },
@@ -396,7 +396,7 @@
                         ]
                     },
                     "B": {
-                        subject: "CS206",
+                        subject: "(Mathematical Computation for Machine Learning(CS206)",
                         className: "B.Tech 3rd Semester Sec B",
                         students: [
                             { roll: "H250042", name: "TANMAY SHEKHAR" }, { roll: "H250047", name: "SACHIN THAKUR" },
@@ -428,10 +428,10 @@
             },
             "5th": {
                 semName: "B.Tech 5th Semester",
-                teacher: "NamanSharma",
+                Faculty: "NamanSharma",
                 sections: {
                     "A": {
-                        subject: "Subject (Edit in code)", // User can change this
+                        subject: "Subject  (Introduction to python programming (CS306))", // User can change this
                         className: "B.Tech 5th Semester Sec A",
                         students: [
                             { roll: "H240087", name: "AKSHANT" }, { roll: "H240109", name: "MANISH" },
@@ -672,7 +672,7 @@
             }
 
             const secData = academicData[currentSemester].sections[currentSection];
-            const message = `*Attendance Report*\n\n*Class:* ${secData.className}\n*Subject:* ${secData.subject}\n*Teacher:* NamanSharma\n*Date:* ${todayDate}\n\n*Absentees List:*\n${absentees.join('\n')}\n\nPlease ensure regular attendance.`;
+            const message = `*Attendance Report*\n\n*Class:* ${secData.className}\n*Subject:* ${secData.subject}\n*Faculty:* NamanSharma\n*Date:* ${todayDate}\n\n*Absentees List:*\n${absentees.join('\n')}\n\n`;
             
             navigator.clipboard.writeText(message).then(() => {
                 alert("Absentees list copied to clipboard! Please paste it in WhatsApp to send.");
