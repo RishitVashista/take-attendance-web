@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Attendance - AI & ML</title>
+    <title>Take Attendance - Mathematical Computation for ML</title>
     <style>
         * {
             box-sizing: border-box;
@@ -16,15 +16,15 @@
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
         .modal {
             background: #fff;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1250px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             overflow: hidden;
@@ -37,40 +37,55 @@
             border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             background: #f8fafc;
+            flex-wrap: wrap; 
+            gap: 10px;
         }
 
         .header-left {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
 
         .modal-title {
             font-size: 18px;
             color: #1e293b;
-            font-weight: 600;
+            font-weight: 700;
+        }
+
+        .info-text {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .info-text span {
+            font-weight: 700;
+            color: #0f172a;
         }
 
         .header-subtitle {
             font-size: 13px;
             color: #ef4444; 
             font-weight: 600;
+            margin-top: 3px;
         }
 
         .live-clock {
-            font-size: 14px;
+            font-size: 13px;
             color: #0ea5e9;
             font-weight: bold;
             background: #e0f2fe;
-            padding: 5px 10px;
+            padding: 6px 10px;
             border-radius: 5px;
         }
 
         .stats {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             font-size: 12px;
         }
 
@@ -92,7 +107,9 @@
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
+            flex-wrap: wrap;
         }
+        
         .filters label {
             display: flex;
             align-items: center;
@@ -104,71 +121,78 @@
 
         /* Grid Section */
         .student-grid {
-            padding: 20px;
+            padding: 15px 20px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-height: 60vh;
+            /* Responsive grid that adjusts automatically */
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); 
+            gap: 8px; 
+            max-height: calc(100vh - 220px); /* Adjusts to fit the screen perfectly */
             overflow-y: auto;
         }
 
         /* Student Card */
         .student-card {
             border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 8px 10px;
+            border-radius: 5px;
+            padding: 6px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.1s;
             user-select: none;
             background: #fff;
+            height: 42px; 
         }
 
         .card-left {
             display: flex;
             align-items: center;
             gap: 8px;
+            overflow: hidden;
         }
 
         /* Serial Number */
         .serial-no {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
             font-weight: bold;
-            min-width: 20px;
+            min-width: 18px;
         }
 
         .student-info {
             display: flex;
             flex-direction: column;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .roll-no {
-            font-size: 11px;
+            font-size: 10px;
             color: #64748b;
             font-weight: 600;
         }
 
         .student-name {
-            font-size: 13px;
+            font-size: 12px;
             color: #1e293b;
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
         }
 
         /* Status Indicator */
         .status-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             color: white;
+            flex-shrink: 0;
         }
 
         /* Absent State (Default) - No cross mark */
@@ -192,21 +216,23 @@
 
         /* Footer Section */
         .modal-footer {
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-top: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #f8fafc;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 8px 14px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             transition: 0.2s;
         }
 
@@ -217,21 +243,27 @@
         .btn-outline { background: transparent; border: 1px solid #cbd5e1; color: #475569; }
         .btn-outline:hover { background: #e2e8f0; }
 
-        /* Responsive */
-        @media (max-width: 900px) { .student-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { 
-            .student-grid { grid-template-columns: 1fr; }
-            .modal-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        /* Responsive adjustments for mobile */
+        @media (max-width: 600px) {
+            .student-grid { grid-template-columns: 1fr; max-height: none; }
+            .modal-header { flex-direction: column; align-items: flex-start; }
+            .modal-footer { flex-direction: column; }
+            .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
 
     <div class="modal">
-        <!-- Header with Live Date, Time and Absentees Mark -->
+        <!-- Header with Live Date, Time and Metadata -->
         <div class="modal-header">
             <div class="header-left">
-                <div class="modal-title">Take Attendance - B.Tech CSE (AI & ML)</div>
+                <div class="modal-title">Take Attendance</div>
+                <div class="info-text">
+                    <strong>Subject:</strong> <span>Mathematical computation for machine learning</span><br>
+                    <strong>Teacher:</strong> <span>NamanSharma</span> &nbsp;|&nbsp; 
+                    <strong>Class:</strong> <span>BTech 3rd semester sec A</span>
+                </div>
                 <!-- Dynamic Line for Absentees -->
                 <div class="header-subtitle" id="absenteeHeaderText">Absentees in red mark on ...</div>
             </div>
@@ -256,10 +288,10 @@
         </div>
 
         <div class="modal-footer">
-            <div>
-                <button class="btn btn-outline" onclick="resetData()">Reset Today's Data</button>
+            <div style="width: 100%; max-width: 150px;">
+                <button class="btn btn-outline" style="width: 100%;" onclick="resetData()">Reset Data</button>
             </div>
-            <div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="generateWhatsAppMessage()">Send to Absentees (WhatsApp)</button>
                 <button class="btn btn-primary" onclick="saveAttendance()">Save Attendance</button>
             </div>
@@ -267,8 +299,7 @@
     </div>
 
     <script>
-        // --- Student Data ---
-        // Roll numbers se 21/22/23 hata kar sirf H250... kar diya gaya hai.
+        // --- Student Data (Exactly as provided by you) ---
         const studentsData = [
             { roll: "H250033", name: "DHRUV CHAUHAN" },
             { roll: "H250044", name: "DEVANSH SHARMA" },
@@ -361,7 +392,7 @@
             if (savedData) {
                 attendanceState = JSON.parse(savedData);
             } else {
-                // Fresh start for the day (Sabhi absent by default)
+                // Fresh start for the day (All absent by default)
                 studentsData.forEach((s, index) => {
                     attendanceState[index] = 'absent'; 
                 });
@@ -381,7 +412,6 @@
                 card.className = `student-card ${isPresent ? 'present' : 'absent'}`;
                 card.onclick = () => toggleAttendance(index);
                 
-                // Yahan par (index + 1) ka use karke numbering (1, 2, 3...) di gayi hai
                 card.innerHTML = `
                     <div class="card-left">
                         <span class="serial-no">${index + 1}</span>
@@ -456,19 +486,34 @@
             });
 
             if (absentees.length === 0) {
-                alert("Sabhi students present hain! Koi absent nahi hai.");
+                alert("All students are present! No absentees found.");
                 return;
             }
 
-            const message = `Dear Parents,\n\nAaj ki date (${todayDate}) par aapka bacha class mein absent hai:\n\n${absentees.join('\n')}\n\nPlease ensure regular attendance.\n\n- Class Teacher (AI & ML)`;
+            // Message includes Subject, Teacher, Class, and Date
+            const message = `*Attendance Report*\n\n*Class:* BTech 3rd semester sec A\n*Subject:* Mathematical computation for machine learning\n*Teacher:* NamanSharma\n*Date:* ${todayDate}\n\n*Absentees List:*\n${absentees.join('\n')}\n\nPlease ensure regular attendance.`;
             
             // Copy to clipboard
             navigator.clipboard.writeText(message).then(() => {
-                alert("Absentees  list IS copied to clipboard! Please paste it in WhatsApp to send.");
+                alert("Absentees list copied to clipboard! Please paste it in WhatsApp to send.");
             }).catch(err => {
-                prompt(" if doesnt Copy so Please manually copy it:", message);
+                prompt("Could not copy automatically. Please manually copy the message below:", message);
             });
         }
+
+        // Select All Checkbox Logic
+        document.getElementById('selectAll').addEventListener('change', function(e) {
+            const isChecked = e.target.checked;
+            const allState = isChecked ? 'present' : 'absent';
+            
+            studentsData.forEach((s, index) => {
+                attendanceState[index] = allState;
+            });
+            
+            saveToLocal();
+            renderGrid();
+            updateStats();
+        });
 
         // Start the app
         init();
