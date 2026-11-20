@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Attendance - Mathematical Computation for ML</title>
+    <title>Take Attendance - B.Tech</title>
     <style>
         * {
             box-sizing: border-box;
@@ -46,13 +46,63 @@
         .header-left {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
+        }
+
+        /* Navigation Tabs Container */
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .tab-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 6px 16px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #475569;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            background: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+        }
+
+        .sub-tab-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #e2e8f0;
+            border: none;
+        }
+
+        .sub-tab-btn.active {
+            background: #0f172a;
+            color: white;
         }
 
         .modal-title {
             font-size: 18px;
             color: #1e293b;
             font-weight: 700;
+            margin-top: 5px;
         }
 
         .info-text {
@@ -123,10 +173,9 @@
         .student-grid {
             padding: 15px 20px;
             display: grid;
-            /* Responsive grid that adjusts automatically */
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); 
             gap: 8px; 
-            max-height: calc(100vh - 220px); /* Adjusts to fit the screen perfectly */
+            max-height: calc(100vh - 300px); 
             overflow-y: auto;
         }
 
@@ -258,11 +307,23 @@
         <!-- Header with Live Date, Time and Metadata -->
         <div class="modal-header">
             <div class="header-left">
+                
+                <!-- NEW: Two-Level Navigation -->
+                <div class="tabs-container">
+                    <div class="tab-row">
+                        <button class="tab-btn active" id="sem-tab-3rd" onclick="switchSemester('3rd')">B.Tech 3rd Semester</button>
+                        <button class="tab-btn" id="sem-tab-5th" onclick="switchSemester('5th')">B.Tech 5th Semester</button>
+                    </div>
+                    <div class="tab-row" id="sectionTabsContainer">
+                        <!-- Section buttons will load here dynamically -->
+                    </div>
+                </div>
+
                 <div class="modal-title">Take Attendance</div>
                 <div class="info-text">
-                    <strong>Subject:</strong> <span>Mathematical computation for machine learning</span><br>
+                    <strong>Subject:</strong> <span id="headerSubject">-</span><br>
                     <strong>Teacher:</strong> <span>NamanSharma</span> &nbsp;|&nbsp; 
-                    <strong>Class:</strong> <span>BTech 3rd semester sec A</span>
+                    <strong>Class:</strong> <span id="headerClass">-</span>
                 </div>
                 <!-- Dynamic Line for Absentees -->
                 <div class="header-subtitle" id="absenteeHeaderText">Absentees in red mark on ...</div>
@@ -271,9 +332,9 @@
                 <!-- Live Clock -->
                 <div class="live-clock" id="liveClock">Loading...</div>
                 <div class="stats">
-                    <span class="stat-badge stat-total" id="totalCount">Total: 45</span>
+                    <span class="stat-badge stat-total" id="totalCount">Total: 0</span>
                     <span class="stat-badge stat-present" id="presentCount">Present: 0</span>
-                    <span class="stat-badge stat-absent" id="absentCount">Absent: 45</span>
+                    <span class="stat-badge stat-absent" id="absentCount">Absent: 0</span>
                 </div>
             </div>
         </div>
@@ -299,54 +360,108 @@
     </div>
 
     <script>
-        // --- Student Data (Exactly as provided by you) ---
-        const studentsData = [
-            { roll: "H250033", name: "DHRUV CHAUHAN" },
-            { roll: "H250044", name: "DEVANSH SHARMA" },
-            { roll: "H250049", name: "HARSHIT SHARMA" },
-            { roll: "H250079", name: "HIMESH THAKUR" },
-            { roll: "H250231", name: "SHUBHAM SHARMA" },
-            { roll: "H250232", name: "YASHITA SHARMA" },
-            { roll: "H250243", name: "YOGRAJ THAKUR" },
-            { roll: "H250252", name: "ADITYA DHIMAN" },
-            { roll: "H250261", name: "ARPRIT SHARMA" },
-            { roll: "H250297", name: "PULKIT SHARMA" },
-            { roll: "H2503083", name: "VIKASH CHAUHAN" },
-            { roll: "H250337", name: "RAJAT CHANDEL" },
-            { roll: "H250343", name: "ABHAY CHOUHAN" },
-            { roll: "H250351", name: "ARYAN SAKLANI" },
-            { roll: "H250353", name: "SHUBHAM" },
-            { roll: "H250360", name: "ABHAY SINGH THAKUR" },
-            { roll: "H250371", name: "SAURABH CHAUHAN" },
-            { roll: "H250398", name: "KHUSI CHAUHAN" },
-            { roll: "H250399", name: "AYUSH RANGRA" },
-            { roll: "H250407", name: "SURYANSH THAKUR" },
-            { roll: "H250409", name: "ANSHUL" },
-            { roll: "H250461", name: "ANKITA KUMARI" },
-            { roll: "H250465", name: "PIYUSH KUMAR" },
-            { roll: "H250493", name: "AMIT NISHAD" },
-            { roll: "H250510", name: "KARTIKEY SHARMA" },
-            { roll: "H250585", name: "ANJALI" },
-            { roll: "H250618", name: "NISHANT THAKUR" },
-            { roll: "H250629", name: "SUMIT KUMAR" },
-            { roll: "H250655", name: "NIKHIL THAKUR" },
-            { roll: "H250661", name: "ADITYA DHIMAN" },
-            { roll: "H250662", name: "ADITYA THAKUR" },
-            { roll: "H250663", name: "SAHIL CHOUDHARY" },
-            { roll: "H250683", name: "ANSHIKA" },
-            { roll: "H250698", name: "SURBHI THAKUR" },
-            { roll: "H250747", name: "RISHIT VASHISTA " },
-            { roll: "H250796", name: "MANVI THAKUR" },
-            { roll: "H250872", name: "ARMAN SUPAHIYA" },
-            { roll: "H250875", name: "SHUBHAM KUMAR" },
-            { roll: "H2500909", name: "ABHISHEK GULERIA" },
-            { roll: "H250915", name: "AYUSH KOUNDAL" },
-            { roll: "H250922", name: "MANISH KUMAR" },
-            { roll: "H250951", name: "ABHISHEK" },
-            { roll: "H250980", name: "RITIKA KUMARI" },
-            { roll: "H250985", name: "MANDEEP SINGH" },
-            { roll: "H251177", name: "PALAK" }
-        ];
+        // --- Master Data Structure ---
+        const academicData = {
+            "3rd": {
+                semName: "B.Tech 3rd Semester",
+                teacher: "NamanSharma",
+                sections: {
+                    "A": {
+                        subject: "Mathematical computation for machine learning",
+                        className: "BTech 3rd semester sec A",
+                        students: [
+                            { roll: "H250033", name: "DHRUV CHAUHAN" }, { roll: "H250044", name: "DEVANSH SHARMA" },
+                            { roll: "H250049", name: "HARSHIT SHARMA" }, { roll: "H250079", name: "HIMESH THAKUR" },
+                            { roll: "H250231", name: "SHUBHAM SHARMA" }, { roll: "H250232", name: "YASHITA SHARMA" },
+                            { roll: "H250243", name: "YOGRAJ THAKUR" }, { roll: "H250252", name: "ADITYA DHIMAN" },
+                            { roll: "H250261", name: "ARPRIT SHARMA" }, { roll: "H250297", name: "PULKIT SHARMA" },
+                            { roll: "H2503083", name: "VIKASH CHAUHAN" }, { roll: "H250337", name: "RAJAT CHANDEL" },
+                            { roll: "H250343", name: "ABHAY CHOUHAN" }, { roll: "H250351", name: "ARYAN SAKLANI" },
+                            { roll: "H250353", name: "SHUBHAM" }, { roll: "H250360", name: "ABHAY SINGH THAKUR" },
+                            { roll: "H250371", name: "SAURABH CHAUHAN" }, { roll: "H250398", name: "KHUSI CHAUHAN" },
+                            { roll: "H250399", name: "AYUSH RANGRA" }, { roll: "H250407", name: "SURYANSH THAKUR" },
+                            { roll: "H250409", name: "ANSHUL" }, { roll: "H250461", name: "ANKITA KUMARI" },
+                            { roll: "H250465", name: "PIYUSH KUMAR" }, { roll: "H250493", name: "AMIT NISHAD" },
+                            { roll: "H250510", name: "KARTIKEY SHARMA" }, { roll: "H250585", name: "ANJALI" },
+                            { roll: "H250618", name: "NISHANT THAKUR" }, { roll: "H250629", name: "SUMIT KUMAR" },
+                            { roll: "H250655", name: "NIKHIL THAKUR" }, { roll: "H250661", name: "ADITYA DHIMAN" },
+                            { roll: "H250662", name: "ADITYA THAKUR" }, { roll: "H250663", name: "SAHIL CHOUDHARY" },
+                            { roll: "H250683", name: "ANSHIKA" }, { roll: "H250698", name: "SURBHI THAKUR" },
+                            { roll: "H250747", name: "RISHIT VASHISTA" }, { roll: "H250796", name: "MANVI THAKUR" },
+                            { roll: "H250872", name: "ARMAN SUPAHIYA" }, { roll: "H250875", name: "SHUBHAM KUMAR" },
+                            { roll: "H2500909", name: "ABHISHEK GULERIA" }, { roll: "H250915", name: "AYUSH KOUNDAL" },
+                            { roll: "H250922", name: "MANISH KUMAR" }, { roll: "H250951", name: "ABHISHEK" },
+                            { roll: "H250980", name: "RITIKA KUMARI" }, { roll: "H250985", name: "MANDEEP SINGH" },
+                            { roll: "H251177", name: "PALAK" }
+                        ]
+                    },
+                    "B": {
+                        subject: "CS206",
+                        className: "B.Tech 3rd Semester Sec B",
+                        students: [
+                            { roll: "H250042", name: "TANMAY SHEKHAR" }, { roll: "H250047", name: "SACHIN THAKUR" },
+                            { roll: "H250060", name: "SHIVANG CHOUDHARY" }, { roll: "H250069", name: "VIREN NAROTA" },
+                            { roll: "H250077", name: "ATUL SHARMA" }, { roll: "H250091", name: "MUNISH KUMAR" },
+                            { roll: "H250092", name: "MRIDUL GUPTA" }, { roll: "H250093", name: "VEENIT SHARMA" },
+                            { roll: "H250120", name: "BADAL SHARMA" }, { roll: "H250198", name: "NEHA" },
+                            { roll: "H250202", name: "SACHIN" }, { roll: "H250322", name: "VISHAL KUMAR" },
+                            { roll: "H250418", name: "NIKHIL THAKUR" }, { roll: "H250434", name: "SMRATI SHARMA" },
+                            { roll: "H250436", name: "SHIVAM" }, { roll: "H250452", name: "ARCHIT CHANDEL" },
+                            { roll: "H250487", name: "KRISH DADHWAL" }, { roll: "H250489", name: "JOY BHATIA" },
+                            { roll: "H250506", name: "SOMYA" }, { roll: "H250511", name: "RAJAT THAKUR" },
+                            { roll: "H250539", name: "PALVI" }, { roll: "H250540", name: "ARYAN CHANDEL" },
+                            { roll: "H250541", name: "HARSH DHIMAN" }, { roll: "H250576", name: "ANSHUL THAKUR" },
+                            { roll: "H250600", name: "LAKSHAY SHARMA" }, { roll: "H250601", name: "PARTEEK KUMAR" },
+                            { roll: "H250604", name: "ARYAN KUMAR" }, { roll: "H250621", name: "VINAYAK SHARMA" },
+                            { roll: "H250622", name: "ARPIT" }, { roll: "H250624", name: "ADITYA THAKUR" },
+                            { roll: "H250639", name: "ANKUSH KUMAR" }, { roll: "H250685", name: "SAMNIKSHA SHARMA" },
+                            { roll: "H250690", name: "MOHIT KUMAR" }, { roll: "H250762", name: "SHIVAM" },
+                            { roll: "H250793", name: "PRATIKSHA" }, { roll: "H250819", name: "AKSH" },
+                            { roll: "H250862", name: "PRINCE SANDHU" }, { roll: "H250880", name: "AMIT KUMAR" },
+                            { roll: "H250905", name: "RAJEET KUMAR" }, { roll: "H250945", name: "AYUSH SHARMA" },
+                            { roll: "H250956", name: "RITIK PATHANIA" }, { roll: "H250955", name: "SHIVANSH" },
+                            { roll: "H251575", name: "PUNEET SHARMA" }, { roll: "H251576", name: "VANSHIKA SHARMA" },
+                            { roll: "H252175", name: "SHREYA SINGH" }
+                        ]
+                    }
+                }
+            },
+            "5th": {
+                semName: "B.Tech 5th Semester",
+                teacher: "NamanSharma",
+                sections: {
+                    "A": {
+                        subject: "Subject (Edit in code)", // User can change this
+                        className: "B.Tech 5th Semester Sec A",
+                        students: [
+                            { roll: "H240087", name: "AKSHANT" }, { roll: "H240109", name: "MANISH" },
+                            { roll: "H240121", name: "REETAK RANA" }, { roll: "H240134", name: "ISHANT" },
+                            { roll: "H240233", name: "REEJUL KATTNA" }, { roll: "H240248", name: "ROHIT VERMA" },
+                            { roll: "H240250", name: "ANSHUL SHARMA" }, { roll: "H240261", name: "ADITYA RANA" },
+                            { roll: "H240266", name: "ANMOL PATIAL" }, { roll: "H240274", name: "PANKAJ KUMAR" },
+                            { roll: "H240280", name: "NEERAJ SHARMA" }, { roll: "H240291", name: "RAJ KUMAR" },
+                            { roll: "H240313", name: "SWARIT" }, { roll: "H240328", name: "SHASHANK" },
+                            { roll: "H240353", name: "ATUL KASHIV" }, { roll: "H240371", name: "RAHUL SHARMA" },
+                            { roll: "H240406", name: "JATIN DADWAL" }, { roll: "H240407", name: "PRAFUL THAKUR" },
+                            { roll: "H240439", name: "RAHUL THAKUR" }, { roll: "H240465", name: "DHRUV BANYAL" },
+                            { roll: "H240474", name: "PIYUSH SHARMA" }, { roll: "H240477", name: "RASHIT" },
+                            { roll: "H240501", name: "SHAGUN SHARMA" }, { roll: "H240502", name: "SAKSHAM CHAUHAN" },
+                            { roll: "H240524", name: "AKSHIT THAKUR" }, { roll: "H240536", name: "SEJAL" },
+                            { roll: "H240538", name: "AKSHAY SHARMA" }, { roll: "H240587", name: "RIYA" },
+                            { roll: "H240623", name: "DEEPANJALI" }, { roll: "H240691", name: "ARYAN SHARMA" },
+                            { roll: "H240699", name: "RADHIKA" }, { roll: "H240709", name: "SAKSHI SHARMA" },
+                            { roll: "H240715", name: "SAKSHAM SHARMA" }, { roll: "H240718", name: "SUSHANT THAKUR" },
+                            { roll: "H240813", name: "ARSHIT ANGIRAS" }, { roll: "H240831", name: "AKSHIT KUMAR" },
+                            { roll: "H240839", name: "ANSHUL KUMAR" }, { roll: "H240849", name: "ADARSH PATIAL" },
+                            { roll: "H240873", name: "ANSHUL DHIMAN" }, { roll: "H250937", name: "AMAN SHARMA" },
+                            { roll: "H250938", name: "AMAN THAKUR" }, { roll: "H240987", name: "DEEPANSHU" },
+                            { roll: "H250988", name: "REEMA" }, { roll: "H250989", name: "VREHA ATTRI" },
+                            { roll: "H251002", name: "NEHA RANA" }, { roll: "H252228", name: "ABHINAV" }
+                        ]
+                    }
+                }
+            }
+        };
 
         const gridContainer = document.getElementById('studentGrid');
         
@@ -354,58 +469,120 @@
         const now = new Date();
         const todayDate = now.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
         
-        // Daily Reset Logic: Key changes every day
-        const storageKey = `attendance_${todayDate}`;
-        
+        // State Management
+        let currentSemester = '3rd';
+        let currentSection = 'A';
         let attendanceState = {};
 
         // 1. Function to Update Live Clock and Header Text
         function updateClockAndHeader() {
             const current = new Date();
-            
-            // Live Time string
             const timeString = current.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: true 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
             });
-            
-            // Live Date string
             const dateString = current.toLocaleDateString('en-GB');
             
             document.getElementById('liveClock').innerText = `📅 ${dateString} | ⏰ ${timeString}`;
-            
-            // Update Header Text
             document.getElementById('absenteeHeaderText').innerText = `Absentees in red mark on ${dateString}`;
         }
 
-        // Initialize App
-        function init() {
-            // Start Clock
-            updateClockAndHeader();
-            setInterval(updateClockAndHeader, 1000); // Update every second
+        // 2. Function to Switch Semester (Level 1)
+        function switchSemester(sem) {
+            currentSemester = sem;
+            
+            // Update active button styling for Semester
+            document.getElementById('sem-tab-3rd').classList.remove('active');
+            document.getElementById('sem-tab-5th').classList.remove('active');
+            document.getElementById(`sem-tab-${sem}`).classList.add('active');
 
-            // Check if data exists for today
+            // Dynamically render section buttons for this semester
+            renderSectionTabs();
+            
+            // Auto-select the first section
+            const availableSections = Object.keys(academicData[currentSemester].sections);
+            switchSection(availableSections[0]);
+        }
+
+        // 3. Function to Render Section Tabs
+        function renderSectionTabs() {
+            const container = document.getElementById('sectionTabsContainer');
+            container.innerHTML = ''; // Clear previous tabs
+            
+            const sections = academicData[currentSemester].sections;
+            
+            for (const secKey in sections) {
+                const btn = document.createElement('button');
+                btn.className = `tab-btn sub-tab-btn ${currentSection === secKey ? 'active' : ''}`;
+                btn.innerText = `Section ${secKey}`;
+                btn.onclick = () => switchSection(secKey);
+                container.appendChild(btn);
+            }
+        }
+
+        // 4. Function to Switch Section (Level 2)
+        function switchSection(sec) {
+            currentSection = sec;
+            
+            // Update section button styling
+            const sectionBtns = document.querySelectorAll('.sub-tab-btn');
+            sectionBtns.forEach(btn => {
+                if(btn.innerText === `Section ${sec}`) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update Header Info
+            const secData = academicData[currentSemester].sections[sec];
+            document.getElementById('headerSubject').innerText = secData.subject;
+            document.getElementById('headerClass').innerText = secData.className;
+
+            // Load data for this section
+            loadStateFromLocal();
+            
+            // Re-render UI
+            renderGrid();
+            updateStats();
+            
+            // Reset Select All checkbox
+            document.getElementById('selectAll').checked = false;
+        }
+
+        // Storage Key generator (Unique for Semester, Section and Date)
+        function getStorageKey() {
+            return `attendance_${currentSemester}_${currentSection}_${todayDate}`;
+        }
+
+        // 5. Initialize App
+        function init() {
+            updateClockAndHeader();
+            setInterval(updateClockAndHeader, 1000); 
+            switchSemester('3rd'); // Start with 3rd Sem
+        }
+
+        // Load state from LocalStorage
+        function loadStateFromLocal() {
+            const storageKey = getStorageKey();
             const savedData = localStorage.getItem(storageKey);
             
             if (savedData) {
                 attendanceState = JSON.parse(savedData);
             } else {
                 // Fresh start for the day (All absent by default)
-                studentsData.forEach((s, index) => {
+                attendanceState = {};
+                academicData[currentSemester].sections[currentSection].students.forEach((s, index) => {
                     attendanceState[index] = 'absent'; 
                 });
             }
-
-            renderGrid();
-            updateStats();
         }
 
-        // Render Student Cards
+        // 6. Render Student Cards
         function renderGrid() {
             gridContainer.innerHTML = '';
-            studentsData.forEach((student, index) => {
+            const students = academicData[currentSemester].sections[currentSection].students;
+            
+            students.forEach((student, index) => {
                 const isPresent = attendanceState[index] === 'present';
                 
                 const card = document.createElement('div');
@@ -426,7 +603,7 @@
             });
         }
 
-        // Toggle Present/Absent
+        // 7. Toggle Present/Absent
         function toggleAttendance(index) {
             if (attendanceState[index] === 'present') {
                 attendanceState[index] = 'absent';
@@ -438,36 +615,38 @@
             saveToLocal(); 
         }
 
-        // Update Counters
+        // 8. Update Counters
         function updateStats() {
             let present = 0;
             let absent = 0;
+            const totalStudents = academicData[currentSemester].sections[currentSection].students.length;
             
             Object.values(attendanceState).forEach(state => {
                 if (state === 'present') present++;
                 else absent++;
             });
 
-            document.getElementById('totalCount').innerText = `Total: ${studentsData.length}`;
+            document.getElementById('totalCount').innerText = `Total: ${totalStudents}`;
             document.getElementById('presentCount').innerText = `Present: ${present}`;
             document.getElementById('absentCount').innerText = `Absent: ${absent}`;
         }
 
-        // Save to LocalStorage (Browser memory)
+        // 9. Save to LocalStorage
         function saveToLocal() {
-            localStorage.setItem(storageKey, JSON.stringify(attendanceState));
+            localStorage.setItem(getStorageKey(), JSON.stringify(attendanceState));
         }
 
-        // Manual Save Button
         function saveAttendance() {
             saveToLocal();
-            alert(`Attendance for ${todayDate} saved successfully!`);
+            const classInfo = academicData[currentSemester].sections[currentSection].className;
+            alert(`Attendance for ${classInfo} (${todayDate}) saved successfully!`);
         }
 
-        // Reset Today's Data
+        // 10. Reset Today's Data
         function resetData() {
-            if(confirm("Are you sure you want to reset today's attendance? All students will be marked absent.")) {
-                studentsData.forEach((s, index) => {
+            const classInfo = academicData[currentSemester].sections[currentSection].className;
+            if(confirm(`Are you sure you want to reset attendance for ${classInfo}?`)) {
+                academicData[currentSemester].sections[currentSection].students.forEach((s, index) => {
                     attendanceState[index] = 'absent';
                 });
                 saveToLocal();
@@ -476,10 +655,12 @@
             }
         }
 
-        // Generate WhatsApp Message for Absentees
+        // 11. Generate WhatsApp Message
         function generateWhatsAppMessage() {
+            const students = academicData[currentSemester].sections[currentSection].students;
             let absentees = [];
-            studentsData.forEach((student, index) => {
+            
+            students.forEach((student, index) => {
                 if (attendanceState[index] === 'absent') {
                     absentees.push(`${student.roll} - ${student.name}`);
                 }
@@ -490,10 +671,9 @@
                 return;
             }
 
-            // Message includes Subject, Teacher, Class, and Date
-            const message = `*Attendance Report*\n\n*Class:* BTech 3rd semester sec A\n*Subject:* Mathematical computation for machine learning\n*Teacher:* NamanSharma\n*Date:* ${todayDate}\n\n*Absentees List:*\n${absentees.join('\n')}\n\nPlease ensure regular attendance.`;
+            const secData = academicData[currentSemester].sections[currentSection];
+            const message = `*Attendance Report*\n\n*Class:* ${secData.className}\n*Subject:* ${secData.subject}\n*Teacher:* NamanSharma\n*Date:* ${todayDate}\n\n*Absentees List:*\n${absentees.join('\n')}\n\nPlease ensure regular attendance.`;
             
-            // Copy to clipboard
             navigator.clipboard.writeText(message).then(() => {
                 alert("Absentees list copied to clipboard! Please paste it in WhatsApp to send.");
             }).catch(err => {
@@ -501,12 +681,12 @@
             });
         }
 
-        // Select All Checkbox Logic
+        // 12. Select All Checkbox Logic
         document.getElementById('selectAll').addEventListener('change', function(e) {
             const isChecked = e.target.checked;
             const allState = isChecked ? 'present' : 'absent';
             
-            studentsData.forEach((s, index) => {
+            academicData[currentSemester].sections[currentSection].students.forEach((s, index) => {
                 attendanceState[index] = allState;
             });
             
